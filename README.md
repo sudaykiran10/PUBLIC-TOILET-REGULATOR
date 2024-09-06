@@ -1,1 +1,2 @@
 # PUBLIC-TOILET-REGULATOR
+Public Toilet Regulator is an IoT-based project designed to regulate access to public toilets by optimizing usage based on the user's age and gender. It utilizes sensors and microcontrollers to gather user data, which is processed to adjust toilet accessibility, ensure hygiene, and manage resources efficiently. The system employs Arduino Uno as the microcontroller, combined with sensors and OpenCV for age and gender detection, enabling real-time decisions for automated access control.
