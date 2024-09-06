@@ -1,0 +1,65 @@
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+
+LiquidCrystal_I2C lcd(0x27, 16, 2); // Replace with your LCD's I2C address
+const int buttonPin = 7;
+const int waterSensorPin = A0;
+const int fanPin = 8;
+
+enum State { Initial, DoorOpen, DoorClosing };
+State currentState = Initial;
+
+unsigned long doorOpenStartTime;
+
+void setup() {
+  pinMode(buttonPin, INPUT_PULLUP);
+  pinMode(waterSensorPin, INPUT);
+  pinMode(fanPin, OUTPUT);
+
+  Serial.begin(9600);
+  
+  // Initialize the LCD
+  lcd.init();
+  lcd.backlight();
+  lcd.setCursor(0, 0);
+  lcd.print("Press button");
+}
+
+void loop() {
+  switch (currentState) {
+    case Initial:
+      if (digitalRead(buttonPin) == LOW) {
+        lcd.setCursor(0, 0);
+        lcd.print("Door open...    ");
+        currentState = DoorOpen;
+        
+        // Start fan
+        digitalWrite(fanPin, HIGH);
+        
+        delay(10000); // Simulate door opening for 10 seconds
+      }
+      break;
+
+    case DoorOpen:
+      if (analogRead(waterSensorPin) >= 600) {
+        lcd.setCursor(0, 0);
+        lcd.print("Flush to close  ");
+        currentState = DoorClosing;
+        
+        // Stop fan
+        digitalWrite(fanPin, LOW);
+      }
+      break;
+
+    case DoorClosing:
+      if (analogRead(waterSensorPin) <= 600) {
+        lcd.setCursor(0, 0);
+        lcd.print("Open door again ");
+        currentState = Initial;
+        
+        // Start fan again
+        digitalWrite(fanPin, HIGH);
+      }
+      break;
+  }
+}
